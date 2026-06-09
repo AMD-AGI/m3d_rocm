@@ -1,0 +1,11 @@
+preset/models/stable-diffusion-2-1-base/
+preset/models/ram_swin_large_14m.pth
+preset/models/ram_swin_large_14m_model_only.safetensors
+preset/models/.cache/
+preset/datasets/
+__pycache__/
+*.pyc
+all_outputs/
+output_*/
+*.png
+*.jpg
