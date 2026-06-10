@@ -44,6 +44,7 @@ def add_lora_to_model(model, target_modules, lora_rank, lora_alpha=None):
     lora_config = LoraConfig(r=lora_rank, lora_alpha=lora_alpha, target_modules=target_modules)
     model = inject_adapter_in_model(lora_config, model)
     return model
+    
 MASK_RATIO = 0.
 class TextVideoDataset(torch.utils.data.Dataset):
     def __init__(self, vid_path, mask_path,text, max_num_frames=81, frame_interval=1, num_frames=81, height=720, width=1440, is_i2v=True):
@@ -60,14 +61,12 @@ class TextVideoDataset(torch.utils.data.Dataset):
         self.is_i2v = is_i2v
         
         # this should not be center crop
-        # should be 
         self.frame_process = v2.Compose([
             #v2.CenterCrop(size=(height, width)),
             v2.Resize(size=(height, width), antialias=True),
             v2.ToTensor(),
             v2.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
         ])
-        
         
     def crop_and_resize(self, image):
         width, height = image.size
@@ -88,7 +87,6 @@ class TextVideoDataset(torch.utils.data.Dataset):
             interpolation=torchvision.transforms.InterpolationMode.BILINEAR
         )
         return image
-
 
     def load_frames_using_imageio(self, file_path, max_num_frames, start_frame_id, interval, num_frames, frame_process):
         reader = imageio.get_reader(file_path)
@@ -117,12 +115,7 @@ class TextVideoDataset(torch.utils.data.Dataset):
         if self.is_i2v:
             return frames, first_frame
         else:
-            return frames
-
-    
-    
-    
-    
+            return frames   
 
     def load_frames_using_imageio_standard(self, file_path, max_num_frames, start_frame_id, interval, num_frames, frame_process):
         reader = imageio.get_reader(file_path)
@@ -148,9 +141,7 @@ class TextVideoDataset(torch.utils.data.Dataset):
         first_frame = v2.functional.center_crop(first_frame, output_size=(self.height, self.width))
         first_frame = np.array(first_frame)
 
-
         return frames
-
 
     def load_video(self, file_path):
         start_frame_id = torch.randint(0, 1, (1,))[0]
@@ -194,6 +185,8 @@ class TextVideoDataset(torch.utils.data.Dataset):
 
     def __len__(self):
         return len(self.path)
+
+
 training_iters=3000 # optimization iterations
 num_of_point_cloud=3000000 # number of point cloud unprojected from depth map
 num_views_per_view=3 # inserted between adjacent camera poses
@@ -257,6 +250,7 @@ def main(args):
     panorama = cv2.resize(cv2.imread(panorama_path, cv2.IMREAD_UNCHANGED),(2048,1024),interpolation=cv2.INTER_AREA)
     input_image_path = os.path.join(case_dir, "moge.png")
     cv2.imwrite(input_image_path, panorama)
+    
     if dist.get_rank() == 0:
         print("\n\nperform moge...\n\n")
         os.system(f"cd code/MoGe && python scripts/infer_panorama.py --input {os.path.abspath(input_image_path)} --output {case_dir} --pretrained {moge_ckpt_path} --device {device} --threshold 0.03 --maps --ply")
@@ -280,6 +274,7 @@ def main(args):
     condition_dir = os.path.join(case_dir,"condition")
     os.makedirs(condition_dir, exist_ok=True)
     camera_path = os.path.join(condition_dir, "cameras.npz")
+    
     if dist.get_rank() == 0:
         rendered_rgb_np = (rendered_rgb.cpu().numpy() * 255.).astype(np.uint8)
         rendered_mask_np = (rendered_mask.float()[:,:,:,None].repeat(1,1,1,3).cpu().numpy() * 255.).astype(np.uint8)
