@@ -370,14 +370,12 @@ def main(args):
     if not use_5b_model:
         #vid_path, mask_path,text,
         tgt_resolution = (1440,720) if is_720p else (960,480)
-        #dset = TextVideoDataset(vid_path = os.path.join(condition_dir,"rendered_rgb.mp4"), mask_path = os.path.join(condition_dir,"rendered_mask.mp4"), text=prompt)
-        # (self, vid_path, mask_path,text, max_num_frames=81, frame_interval=1, num_frames=81, height=720, width=1440, is_i2v=True):
         dset = TextVideoDataset(vid_path = os.path.join(condition_dir,"rendered_rgb.mp4"), mask_path = os.path.join(condition_dir,"rendered_mask.mp4"), text=prompt, height=tgt_resolution[1],width=tgt_resolution[0])
         cases = dset[0]
         prompt = cases["text"]
         cond_video = ((cases["masked_video"].permute(1,2,3,0) + 1.) / 2. * 255.).cpu().numpy()
         cond_mask = ((cases["mask_video"].permute(1,2,3,0) + 1.) / 2. * 255.).cpu().numpy()
-        #print(prompt[i])
+  
         video = pipe(
             prompt=prompt+" The video is of high quality, and the view is very clear. High quality, masterpiece, best quality, highres, ultra-detailed, fantastic.",
             negative_prompt="The video is not of a high quality, it has a low resolution. Distortion. strange artifacts.",
@@ -404,7 +402,6 @@ def main(args):
             }
         ]
         dset = VideoDataset(
-            #base_path="/", metadata_path="/datasets_3d/zhongqi.yang/matrix3d_inference/dataset/metadata_1k.csv",
             base_path="/", metadata_path=None,
             num_frames=81,
             time_division_factor=4, time_division_remainder=1,
