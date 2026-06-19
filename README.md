@@ -1,7 +1,7 @@
 # Efficient and Portable 3D Explorable World Generation on AMD GPUs
 
 <div>
-  <a href="https://advanced-micro-devices-rocm-blogs--2313.com.readthedocs.build/projects/internal/en/2313/artificial-intelligence/dworld-m3d/README.html"><img src="https://img.shields.io/badge/ROCm%20Developer%20Blog-red"></a> &ensp;
+  <a href="https://rocm.blogs.amd.com/artificial-intelligence/dworld-m3d/README.html"><img src="https://img.shields.io/badge/ROCm%20Developer%20Blog-red"></a> &ensp;
 </div>
 
 ---
